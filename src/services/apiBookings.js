@@ -1,131 +1,194 @@
+// DEV-ONLY BOOKINGS/STAYS STUB
+// Replaces Supabase with localStorage-backed bookings for Franken-JRPG.
+
 // import { getToday } from "../utils/helpers";
-// import supabase from "./supabase";
 // import { PAGE_SIZE } from "../utils/constants";
 
-export async function getBookings({ filter, sortBy, page }) {
-  // let query = supabase
-  //   .from("bookings")
-  //   .select(
-  //     "id, created_at, startDate, endDate, numNights, numGuests, status, totalPrice, cabins(name), guests(fullName, email)",
-  //     { count: "exact" }
-  //   );
+const STORAGE_KEY = "franken-dev-bookings";
+const PAGE_SIZE = 10;
 
-  // // FILTER
-  // if (filter) query = query[filter.method || "eq"](filter.field, filter.value);
-
-  // // SORT
-  // if (sortBy)
-  //   query = query.order(sortBy.field, {
-  //     ascending: sortBy.direction === "asc",
-  //   });
-
-  // if (page) {
-  //   const from = (page - 1) * PAGE_SIZE;
-  //   const to = from + PAGE_SIZE - 1;
-  //   query = query.range(from, to);
-  // }
-
-  // const { data, error, count } = await query;
-
-  // if (error) {
-  //   console.error(error);
-  //   throw new Error("Bookings could not be loaded");
-  // }
-
-  return [];
+function todayISODate() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
 }
+
+function seedDevBookings() {
+  const data = [
+    {
+      id: "booking-1",
+      created_at: new Date().toISOString(),
+      startDate: todayISODate(),
+      endDate: todayISODate(),
+      numNights: 1,
+      numGuests: 1,
+      status: "checked-in",
+      totalPrice: 80,
+      cabins: { name: "Room 1 – Widow's Walk" },
+      guests: { fullName: "Ada Lovelace", email: "ada@example.com" },
+    },
+    {
+      id: "booking-2",
+      created_at: new Date().toISOString(),
+      startDate: todayISODate(),
+      endDate: todayISODate(),
+      numNights: 1,
+      numGuests: 2,
+      status: "unconfirmed",
+      totalPrice: 150,
+      cabins: { name: "Room 3 – Crypt Suite" },
+      guests: { fullName: "Mary Shelley", email: "mary@example.com" },
+    },
+  ];
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  return data;
+}
+
+function readBookings() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return seedDevBookings();
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return seedDevBookings();
+  }
+}
+
+function writeBookings(bookings) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+}
+
+function makeId(prefix = "booking") {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
+}
+
+function compareValues(a, b, direction) {
+  const dir = direction === "asc" ? 1 : -1;
+
+  if (a == null && b == null) return 0;
+  if (a == null) return -1 * dir;
+  if (b == null) return 1 * dir;
+
+  if (typeof a === "number" && typeof b === "number") {
+    return (a - b) * dir;
+  }
+
+  const sa = String(a);
+  const sb = String(b);
+  return sa.localeCompare(sb) * dir;
+}
+
+// --------- PUBLIC API ----------
+
+export async function getBookings({ filter, sortBy, page } = {}) {
+  let rows = [...readBookings()];
+
+  // FILTER: simple equals on top-level field (e.g., status)
+  if (filter && filter.field && filter.value !== undefined && filter.value !== null) {
+    rows = rows.filter((booking) => {
+      const value = booking[filter.field];
+      return String(value) === String(filter.value);
+    });
+  }
+
+  // Save total count BEFORE pagination
+  const totalCount = rows.length;
+
+  // SORT
+  if (sortBy && sortBy.field) {
+    rows.sort((a, b) =>
+      compareValues(a[sortBy.field], b[sortBy.field], sortBy.direction)
+    );
+  }
+
+  // PAGINATION
+  if (page && typeof page === "number") {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE;
+    rows = rows.slice(from, to);
+  }
+
+  // Match original API shape: { data, count }
+  return {
+    data: rows,
+    count: totalCount,
+  };
+}
+
 
 export async function getBooking(id) {
-  // const { data, error } = await supabase
-  //   .from("bookings")
-  //   .select("*, cabins(*), guests(*)")
-  //   .eq("id", id)
-  //   .single();
-
-  // if (error) {
-  //   console.error(error);
-  //   throw new Error("Booking not found");
-  // }
-
-  return null;
+  const bookings = readBookings();
+  const booking = bookings.find((b) => b.id === id) || null;
+  return booking;
 }
 
-// Returns all BOOKINGS that are were created after the given date. Useful to get bookings created in the last 30 days, for example.
-// date: ISOString
+// BOOKINGS created after given date (ISOString)
 export async function getBookingsAfterDate(date) {
-  // const { data, error } = await supabase
-  //   .from("bookings")
-  //   .select("created_at, totalPrice, extrasPrice")
-  //   .gte("created_at", date)
-  //   .lte("created_at", getToday({ end: true }));
+  const since = new Date(date);
+  const now = new Date();
 
-  // if (error) {
-  //   console.error(error);
-  //   throw new Error("Bookings could not get loaded");
-  // }
+  const bookings = readBookings().filter((b) => {
+    const created = new Date(b.created_at);
+    return created >= since && created <= now;
+  });
 
-  return [];
+  return bookings;
 }
 
-// Returns all STAYS that are were created after the given date
+// STAYS after given start date
 export async function getStaysAfterDate(date) {
-  // const { data, error } = await supabase
-  //   .from("bookings")
-  //   .select("*, guests(fullName)")
-  //   .gte("startDate", date)
-  //   .lte("startDate", getToday());
+  const stays = readBookings().filter((b) => {
+    const start = new Date(b.startDate);
+    return start >= new Date(date);
+  });
 
-  // if (error) {
-  //   console.error(error);
-  //   throw new Error("Bookings could not get loaded");
-  // }
-
-  return [];
+  // In original app, these are "stays", but here we just reuse bookings
+  return stays;
 }
 
-// Activity means that there is a check in or a check out today
+// Activity: check-ins/check-outs for today
 export async function getStaysTodayActivity() {
-  // const { data, error } = await supabase
-  //   .from("bookings")
-  //   .select("*, guests(fullName, nationality, countryFlag)")
-  //   .or(
-  //     `and(status.eq.unconfirmed,startDate.eq.${getToday()}),and(status.eq.checked-in,endDate.eq.${getToday()})`
-  //   )
-  //   .order("created_at");
+  const today = todayISODate();
 
-  // // Equivalent to this. But by querying this, we only download the data we actually need, otherwise we would need ALL bookings ever created
-  // // (stay.status === 'unconfirmed' && isToday(new Date(stay.startDate))) ||
-  // // (stay.status === 'checked-in' && isToday(new Date(stay.endDate)))
+  const stays = readBookings().filter((stay) => {
+    const isCheckInToday =
+      stay.status === "unconfirmed" && stay.startDate === today;
+    const isCheckOutToday =
+      stay.status === "checked-in" && stay.endDate === today;
+    return isCheckInToday || isCheckOutToday;
+  });
 
-  // if (error) {
-  //   console.error(error);
-  //   throw new Error("Bookings could not get loaded");
-  // }
-  return [];
+  // Original used guests(fullName, nationality, countryFlag).
+  // Our stub already has guests.fullName; nationality/flag omitted for now.
+  return stays;
 }
 
 export async function updateBooking(id, obj) {
-  // const { data, error } = await supabase
-  //   .from("bookings")
-  //   .update(obj)
-  //   .eq("id", id)
-  //   .select()
-  //   .single();
+  const bookings = readBookings();
+  const index = bookings.findIndex((b) => b.id === id);
 
-  // if (error) {
-  //   console.error(error);
-  //   throw new Error("Booking could not be updated");
-  // }
-  return { id, ...obj };
+  if (index === -1) {
+    const created = { id, ...obj };
+    bookings.push(created);
+    writeBookings(bookings);
+    return created;
+  }
+
+  const updated = { ...bookings[index], ...obj, id };
+  bookings[index] = updated;
+  writeBookings(bookings);
+  return updated;
 }
 
 export async function deleteBooking(id) {
-  // // REMEMBER RLS POLICIES
-  // const { data, error } = await supabase.from("bookings").delete().eq("id", id);
-
-  // if (error) {
-  //   console.error(error);
-  //   throw new Error("Booking could not be deleted");
-  // }
+  const bookings = readBookings().filter((b) => b.id !== id);
+  writeBookings(bookings);
   return;
 }
