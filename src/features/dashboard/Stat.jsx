@@ -12,6 +12,8 @@ const StyledStat = styled.div`
   grid-template-rows: auto auto;
   column-gap: 1.6rem;
   row-gap: 0.4rem;
+
+  box-shadow: 0 0 24px rgba(20, 12, 34, 0.6);
 `;
 
 const Icon = styled.div`

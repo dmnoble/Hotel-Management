@@ -57,7 +57,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       onSubmit={handleSubmit(onSubmit, onError)}
       type={onCloseModal ? "modal" : "regular"}
     >
-      <FormRow label="Cabin name" error={errors?.name?.message}>
+      <FormRow label="Chamber name" error={errors?.name?.message}>
         <Input
           type="text"
           id="name"
@@ -83,7 +83,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         />
       </FormRow>
 
-      <FormRow label="Regular price" error={errors?.regularPrice?.message}>
+      <FormRow label="Nightly rate" error={errors?.regularPrice?.message}>
         <Input
           type="number"
           id="regularPrice"
@@ -114,7 +114,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       </FormRow>
 
       <FormRow
-        label="Description for website"
+        label="Description for ledger & brochure"
         error={errors?.description?.message}
       >
         <Textarea
@@ -128,7 +128,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         />
       </FormRow>
 
-      <FormRow label="Cabin photo">
+      <FormRow label="Chamber portrait">
         <FileInput
           id="image"
           accept="image/*"
@@ -148,7 +148,7 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
           Cancel
         </Button>
         <Button disabled={isWorking}>
-          {isEditSession ? "Edit cabin" : "Create new cabin"}
+          {isEditSession ? "Update chamber" : "Create new chamber"}
         </Button>
       </FormRow>
     </Form>

@@ -8,8 +8,15 @@ function Cabins() {
   return (
     <>
       <Row type="horizontal">
-        <Heading as="h1">All cabins</Heading>
+        <Heading as="h1">Guest chambers</Heading>
         <CabinTableOperations />
+      </Row>
+
+      <Row type="vertical">
+        <p>
+          Review each chamber&apos;s capacity, rates, and current temptations for
+          weary travelers.
+        </p>
       </Row>
 
       <Row>

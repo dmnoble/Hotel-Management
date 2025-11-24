@@ -1,39 +1,17 @@
 // DEV-ONLY CABINS/ROOMS STUB
 // Replaces Supabase calls with localStorage-backed data for Franken-JRPG.
 
+import { cabins as seedCabins } from "../data/data-cabins";
+
 const STORAGE_KEY = "franken-dev-cabins";
 
 function seedDevCabins() {
-  const data = [
-    {
-      id: "room-1",
-      name: "Room 1 – Widow's Walk",
-      maxCapacity: 2,
-      regularPrice: 80,
-      discount: 0,
-      description: "A narrow chamber overlooking the fog-shrouded courtyard.",
-      image: "",
-    },
-    {
-      id: "room-2",
-      name: "Room 2 – Lantern Nook",
-      maxCapacity: 3,
-      regularPrice: 110,
-      discount: 10,
-      description: "Warm, candlelit room with a view of the old orchard.",
-      image: "",
-    },
-    {
-      id: "room-3",
-      name: "Room 3 – Crypt Suite",
-      maxCapacity: 4,
-      regularPrice: 150,
-      discount: 0,
-      description:
-        "Spacious suite rumored to share a wall with a forgotten cellar.",
-      image: "",
-    },
-  ];
+  // Take the static seed data and give each cabin a stable id if it doesn't have one
+  const data = seedCabins.map((cabin, index) => ({
+    // id: use existing id if present, otherwise derive one
+    id: cabin.id ?? index + 1,
+    ...cabin,
+  }));
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   return data;
@@ -72,7 +50,7 @@ export async function createEditCabin(newCabin, id) {
   // CREATE
   if (!id) {
     const cabin = {
-      id: makeId("room"),
+      id: makeId("chamber"),
       ...newCabin,
     };
     cabins.push(cabin);

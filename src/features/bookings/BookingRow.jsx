@@ -22,7 +22,7 @@ import { useDeleteBooking } from "./useDeleteBooking";
 const Cabin = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
-  color: var(--color-grey-600);
+  color: var(--color-brand-500);
   font-family: "Sono";
 `;
 
@@ -82,9 +82,9 @@ function BookingRow({
       <Stacked>
         <span>
           {isToday(new Date(startDate))
-            ? "Today"
-            : formatDistanceFromNow(startDate)}{" "}
-          &rarr; {numNights} night stay
+            ? "Arriving tonight"
+            : `${formatDistanceFromNow(startDate)} arrival`}{" "}
+          &rarr; {numNights} night{numNights > 1 ? "s" : ""} in residence
         </span>
         <span>
           {format(new Date(startDate), "MMM dd yyyy")} &mdash;{" "}
@@ -104,7 +104,7 @@ function BookingRow({
               icon={<HiEye />}
               onClick={() => navigate(`/bookings/${bookingId}`)}
             >
-              See details
+              View stay
             </Menus.Button>
 
             {status === "unconfirmed" && (
@@ -112,7 +112,7 @@ function BookingRow({
                 icon={<HiArrowDownOnSquare />}
                 onClick={() => navigate(`/checkin/${bookingId}`)}
               >
-                Check in
+                Welcome guest
               </Menus.Button>
             )}
 
@@ -122,12 +122,12 @@ function BookingRow({
                 onClick={() => checkout(bookingId)}
                 disabled={isCheckingOut}
               >
-                Check out
+                Release room
               </Menus.Button>
             )}
 
             <Modal.Open opens="delete">
-              <Menus.Button icon={<HiTrash />}>Delete booking</Menus.Button>
+              <Menus.Button icon={<HiTrash />}>Cancel stay</Menus.Button>
             </Modal.Open>
           </Menus.List>
         </Menus.Menu>

@@ -4,6 +4,10 @@
 // import { getToday } from "../utils/helpers";
 // import { PAGE_SIZE } from "../utils/constants";
 
+import { bookings as seedBookings } from "../data/data-bookings";
+import { cabins as seedCabins } from "../data/data-cabins";
+import { guests as seedGuests } from "../data/data-guests";
+
 const STORAGE_KEY = "franken-dev-bookings";
 const PAGE_SIZE = 10;
 
@@ -16,32 +20,40 @@ function todayISODate() {
 }
 
 function seedDevBookings() {
-  const data = [
-    {
-      id: "booking-1",
-      created_at: new Date().toISOString(),
-      startDate: todayISODate(),
-      endDate: todayISODate(),
-      numNights: 1,
-      numGuests: 1,
-      status: "checked-in",
-      totalPrice: 80,
-      cabins: { name: "Room 1 – Widow's Walk" },
-      guests: { fullName: "Ada Lovelace", email: "ada@example.com" },
-    },
-    {
-      id: "booking-2",
-      created_at: new Date().toISOString(),
-      startDate: todayISODate(),
-      endDate: todayISODate(),
-      numNights: 1,
-      numGuests: 2,
-      status: "unconfirmed",
-      totalPrice: 150,
-      cabins: { name: "Room 3 – Crypt Suite" },
-      guests: { fullName: "Mary Shelley", email: "mary@example.com" },
-    },
-  ];
+  const data = seedBookings.map((booking) => {
+    // Match cabin and guest by id
+    const cabin = seedCabins.find((c) => c.id === booking.cabinId);
+    const guest = seedGuests.find((g) => g.id === booking.guestId);
+
+    return {
+      // Keep all original booking fields (status, dates, prices, etc.)
+      ...booking,
+
+      // Ensure we have an id field (if not already present)
+      id: booking.id ?? `booking-${booking.cabinId}-${booking.guestId}-${booking.startDate}`,
+
+      // Ensure created_at exists for “recent bookings” queries
+      created_at: booking.created_at ?? new Date().toISOString(),
+
+      // Join cabin info like Supabase `select("*, cabins(name)")` would
+      cabins: cabin
+        ? { name: cabin.name }
+        : { name: "Unknown chamber" },
+
+      // Join guest info like Supabase `select("*, guests(fullName, email, nationality, countryFlag)")`
+      guests: guest
+        ? {
+          fullName: guest.fullName,
+          email: guest.email,
+          nationality: guest.nationality,
+          countryFlag: guest.countryFlag,
+        }
+        : {
+          fullName: "Unknown guest",
+          email: "",
+        },
+    };
+  });
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   return data;
