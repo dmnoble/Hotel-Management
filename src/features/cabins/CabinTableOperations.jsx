@@ -8,20 +8,20 @@ function CabinTableOperations() {
       <Filter
         filterField="discount"
         options={[
-          { value: "all", label: "All" },
-          { value: "no-discount", label: "No discount" },
-          { value: "with-discount", label: "With discount" },
+          { value: "all", label: "All chambers" },
+          { value: "no-discount", label: "Standard rate" },
+          { value: "with-discount", label: "On special rate" },
         ]}
       />
 
       <SortBy
         options={[
-          { value: "name-asc", label: "Sort by name (A-Z)" },
-          { value: "name-desc", label: "Sort by name (Z-A)" },
-          { value: "regularPrice-asc", label: "Sort by price (low first)" },
-          { value: "regularPrice-desc", label: "Sort by price (high first)" },
-          { value: "maxCapacity-asc", label: "Sort by capacity (low first)" },
-          { value: "maxCapacity-desc", label: "Sort by capacity (high first)" },
+          { value: "name-asc", label: "Name (A–Z)" },
+          { value: "name-desc", label: "Name (Z–A)" },
+          { value: "regularPrice-asc", label: "Rate (low to high)" },
+          { value: "regularPrice-desc", label: "Rate (high to low)" },
+          { value: "maxCapacity-asc", label: "Capacity (fewer souls first)" },
+          { value: "maxCapacity-desc", label: "Capacity (more souls first)" },
         ]}
       />
     </TableOperations>

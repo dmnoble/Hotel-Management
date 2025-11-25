@@ -48,10 +48,16 @@ function BookingDetail() {
     <>
       <Row type="horizontal">
         <HeadingGroup>
-          <Heading as="h1">Booking #{bookingId}</Heading>
-          <Tag type={statusToTagName[status]}>{status.replace("-", " ")}</Tag>
+          <Heading as="h1">Stay record #{bookingId}</Heading>
+          <Tag type={statusToTagName[status]}>
+            {status === "unconfirmed"
+              ? "Not yet arrived"
+              : status === "checked-in"
+                ? "Currently in-house"
+                : "Departed"}
+          </Tag>
         </HeadingGroup>
-        <ButtonText onClick={moveBack}>&larr; Back</ButtonText>
+        <ButtonText onClick={moveBack}>&larr; Back to stays</ButtonText>
       </Row>
 
       <BookingDataBox booking={booking} />
@@ -59,7 +65,7 @@ function BookingDetail() {
       <ButtonGroup>
         {status === "unconfirmed" && (
           <Button onClick={() => navigate(`/checkin/${bookingId}`)}>
-            Check in
+            Welcome guest
           </Button>
         )}
 
@@ -69,13 +75,13 @@ function BookingDetail() {
             onClick={() => checkout(bookingId)}
             disabled={isCheckingOut}
           >
-            Check out
+            Release room
           </Button>
         )}
 
         <Modal>
           <Modal.Open opens="delete">
-            <Button variation="danger">Delete booking</Button>
+            <Button variation="danger">Cancel stay</Button>
           </Modal.Open>
 
           <Modal.Window name="delete">
@@ -92,7 +98,7 @@ function BookingDetail() {
         </Modal>
 
         <Button variation="secondary" onClick={moveBack}>
-          Back
+          Back to stays
         </Button>
       </ButtonGroup>
     </>

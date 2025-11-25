@@ -1,27 +1,45 @@
-import supabase from "./supabase";
+// DEV-ONLY SETTINGS STUB
+// Replaces Supabase "settings" table with localStorage-backed house rules.
 
-export async function getSettings() {
-  const { data, error } = await supabase.from("settings").select("*").single();
+// import supabase from "./supabase";
 
-  if (error) {
-    console.error(error);
-    throw new Error("Settings could not be loaded");
+const STORAGE_KEY = "franken-dev-settings";
+
+const DEFAULT_SETTINGS = {
+  minBookingLength: 1,
+  maxBookingLength: 30,
+  maxGuestsPerBooking: 4,
+  breakfastPrice: 15, // you can rename/use differently later for your inn
+};
+
+function readSettings() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS));
+    return { ...DEFAULT_SETTINGS };
   }
-  return data;
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS));
+    return { ...DEFAULT_SETTINGS };
+  }
 }
 
-// We expect a newSetting object that looks like {setting: newValue}
-export async function updateSetting(newSetting) {
-  const { data, error } = await supabase
-    .from("settings")
-    .update(newSetting)
-    // There is only ONE row of settings, and it has the ID=1, and so this is the updated one
-    .eq("id", 1)
-    .single();
+function writeSettings(settings) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+}
 
-  if (error) {
-    console.error(error);
-    throw new Error("Settings could not be updated");
-  }
-  return data;
+export async function getSettings() {
+  // In the original app this returned a single row from "settings".
+  return readSettings();
+}
+
+// We expect a newSetting object that looks like { settingName: newValue }
+export async function updateSetting(newSetting) {
+  const current = readSettings();
+  const updated = { ...current, ...newSetting };
+  writeSettings(updated);
+  return updated;
 }

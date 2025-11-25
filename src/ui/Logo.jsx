@@ -10,14 +10,38 @@ const Img = styled.img`
   width: auto;
 `;
 
+const Title = styled.div`
+  font-family: "Cinzel", "Times New Roman", serif;
+  font-size: 2.4rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-brand-500);
+`;
+
+const Subtitle = styled.div`
+  font-size: 1.2rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-grey-500);
+  margin-top: 0.4rem;
+`;
+
 function Logo() {
   const { isDarkMode } = useDarkMode();
 
-  const src = isDarkMode ? "/logo-dark.png" : "/logo-light.png";
+  const src = isDarkMode ? "/logo-for-franken-jrpg3.png" : "/logo-for-franken-jrpg3.png";
 
   return (
     <StyledLogo>
-      <Img src={src} alt="Logo" />
+      {/* If the images exist, show them; otherwise show text */}
+      {src ? (
+        <Img src={src} alt="The Gloaming House logo" />
+      ) : (
+        <>
+          <Title>The Gloaming House</Title>
+          <Subtitle>Inn Management Board</Subtitle>
+        </>
+      )}
     </StyledLogo>
   );
 }

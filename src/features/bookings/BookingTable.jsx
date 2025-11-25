@@ -12,17 +12,17 @@ function BookingTable() {
 
   if (isLoading) return <Spinner />;
 
-  if (!bookings.length) return <Empty resourceName="bookings" />;
+  if (!bookings.length) return 'No stays to show. The inn is quiet… for now.';
 
   return (
     <Menus>
       <Table columns="0.6fr 2fr 2.4fr 1.4fr 1fr 3.2rem">
         <Table.Header>
-          <div>Cabin</div>
+          <div>Room</div>
           <div>Guest</div>
-          <div>Dates</div>
+          <div>Stay</div>
           <div>Status</div>
-          <div>Amount</div>
+          <div>Total</div>
           <div></div>
         </Table.Header>
 

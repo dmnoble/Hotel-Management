@@ -77,9 +77,9 @@ const Price = styled.div`
   margin-top: 2.4rem;
 
   background-color: ${(props) =>
-    props.isPaid ? "var(--color-green-100)" : "var(--color-yellow-100)"};
+    props.isPaid ? "var(--color-brand-100)" : "var(--color-yellow-100)"};
   color: ${(props) =>
-    props.isPaid ? "var(--color-green-700)" : "var(--color-yellow-700)"};
+    props.isPaid ? "var(--color-brand-700)" : "var(--color-yellow-700)"};
 
   & p:last-child {
     text-transform: uppercase;
@@ -125,7 +125,8 @@ function BookingDataBox({ booking }) {
         <div>
           <HiOutlineHomeModern />
           <p>
-            {numNights} nights in Cabin <span>{cabinName}</span>
+            {numNights} night{numNights > 1 ? "s" : ""} in Room{" "}
+            <span>{cabinName}</span>
           </p>
         </div>
 
@@ -153,18 +154,18 @@ function BookingDataBox({ booking }) {
         {observations && (
           <DataItem
             icon={<HiOutlineChatBubbleBottomCenterText />}
-            label="Observations"
+            label="Notes & omens"
           >
             {observations}
           </DataItem>
         )}
 
-        <DataItem icon={<HiOutlineCheckCircle />} label="Breakfast included?">
-          {hasBreakfast ? "Yes" : "No"}
+        <DataItem icon={<HiOutlineCheckCircle />} label="Breakfast service?">
+          {hasBreakfast ? "Promised" : "Not offered"}
         </DataItem>
 
         <Price isPaid={isPaid}>
-          <DataItem icon={<HiOutlineCurrencyDollar />} label={`Total price`}>
+          <DataItem icon={<HiOutlineCurrencyDollar />} label={`Total for this stay`}>
             {formatCurrency(totalPrice)}
 
             {hasBreakfast &&
@@ -173,12 +174,15 @@ function BookingDataBox({ booking }) {
               )} breakfast)`}
           </DataItem>
 
-          <p>{isPaid ? "Paid" : "Will pay at property"}</p>
+          <p>{isPaid ? "Settled in ledger" : "Due on departure"}</p>
         </Price>
       </Section>
 
       <Footer>
-        <p>Booked {format(new Date(created_at), "EEE, MMM dd yyyy, p")}</p>
+        <p>
+          Recorded in ledger{" "}
+          {format(new Date(created_at), "EEE, MMM dd yyyy, p")}
+        </p>
       </Footer>
     </StyledBookingDataBox>
   );

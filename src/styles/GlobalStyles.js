@@ -5,9 +5,9 @@ const GlobalStyles = createGlobalStyle`
   &, &.light-mode {
   /* Grey */
   --color-grey-0: #fff;
-  --color-grey-50: #f9fafb;
-  --color-grey-100: #f3f4f6;
-  --color-grey-200: #e5e7eb;
+  --color-grey-50: #f5f3ff;
+  --color-grey-100: #ede9fe;
+  --color-grey-200: #ddd6fe;
   --color-grey-300: #d1d5db;
   --color-grey-400: #9ca3af;
   --color-grey-500: #6b7280;
@@ -80,15 +80,15 @@ const GlobalStyles = createGlobalStyle`
 --image-opacity: 90%;
   }
   
-  /* Indigo */
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;
+  /* Franken-JRPG brand */
+  --color-brand-50: #f4efff;
+  --color-brand-100: #e3d8ff;
+  --color-brand-200: #c9b5ff;
+  --color-brand-500: #7f5af0;
+  --color-brand-600: #5a3bb4;
+  --color-brand-700: #3a255f;
+  --color-brand-800: #24163a;
+  --color-brand-900: #140c22;
   
   --border-radius-tiny: 3px;
   --border-radius-sm: 5px;
@@ -121,6 +121,17 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   font-size: 1.6rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Cinzel", "Times New Roman", serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 input,

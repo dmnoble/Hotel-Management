@@ -29,89 +29,25 @@ const ChartBox = styled.div`
 `;
 
 const startDataLight = [
-  {
-    duration: "1 night",
-    value: 0,
-    color: "#ef4444",
-  },
-  {
-    duration: "2 nights",
-    value: 0,
-    color: "#f97316",
-  },
-  {
-    duration: "3 nights",
-    value: 0,
-    color: "#eab308",
-  },
-  {
-    duration: "4-5 nights",
-    value: 0,
-    color: "#84cc16",
-  },
-  {
-    duration: "6-7 nights",
-    value: 0,
-    color: "#22c55e",
-  },
-  {
-    duration: "8-14 nights",
-    value: 0,
-    color: "#14b8a6",
-  },
-  {
-    duration: "15-21 nights",
-    value: 0,
-    color: "#3b82f6",
-  },
-  {
-    duration: "21+ nights",
-    value: 0,
-    color: "#a855f7",
-  },
+  { duration: "1 night", value: 0, color: "#7f5af0" }, // violet
+  { duration: "2 nights", value: 0, color: "#a855f7" }, // purple
+  { duration: "3 nights", value: 0, color: "#ec4899" }, // pink
+  { duration: "4-5 nights", value: 0, color: "#f97316" }, // amber
+  { duration: "6-7 nights", value: 0, color: "#22c55e" }, // green
+  { duration: "8-14 nights", value: 0, color: "#14b8a6" }, // teal
+  { duration: "15-21 nights", value: 0, color: "#0ea5e9" }, // sky
+  { duration: "21+ nights", value: 0, color: "#eab308" },  // gold
 ];
 
 const startDataDark = [
-  {
-    duration: "1 night",
-    value: 0,
-    color: "#b91c1c",
-  },
-  {
-    duration: "2 nights",
-    value: 0,
-    color: "#c2410c",
-  },
-  {
-    duration: "3 nights",
-    value: 0,
-    color: "#a16207",
-  },
-  {
-    duration: "4-5 nights",
-    value: 0,
-    color: "#4d7c0f",
-  },
-  {
-    duration: "6-7 nights",
-    value: 0,
-    color: "#15803d",
-  },
-  {
-    duration: "8-14 nights",
-    value: 0,
-    color: "#0f766e",
-  },
-  {
-    duration: "15-21 nights",
-    value: 0,
-    color: "#1d4ed8",
-  },
-  {
-    duration: "21+ nights",
-    value: 0,
-    color: "#7e22ce",
-  },
+  { duration: "1 night", value: 0, color: "#3f2b79ff" }, // violet
+  { duration: "2 nights", value: 0, color: "#5e2f8aff" }, // purple
+  { duration: "3 nights", value: 0, color: "#7f2652ff" }, // pink
+  { duration: "4-5 nights", value: 0, color: "#72370cff" }, // amber
+  { duration: "6-7 nights", value: 0, color: "#136531ff" }, // green
+  { duration: "8-14 nights", value: 0, color: "#0b6258ff" }, // teal
+  { duration: "15-21 nights", value: 0, color: "#043f5bff" }, // sky
+  { duration: "21+ nights", value: 0, color: "#584302ff" },  // gold
 ];
 
 function prepareData(startData, stays) {
@@ -148,7 +84,7 @@ function DurationChart({ confirmedStays }) {
 
   return (
     <ChartBox>
-      <Heading as="h2">Stay duration summary</Heading>
+      <Heading as="h2">How long guests linger</Heading>
       <ResponsiveContainer width="100%" height={240}>
         <PieChart>
           <Pie

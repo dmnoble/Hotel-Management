@@ -45,22 +45,22 @@ function SalesChart({ bookings, numDays }) {
 
   const colors = isDarkMode
     ? {
-        totalSales: { stroke: "#4f46e5", fill: "#4f46e5" },
-        extrasSales: { stroke: "#22c55e", fill: "#22c55e" },
-        text: "#e5e7eb",
-        background: "#18212f",
-      }
+      totalSales: { stroke: "#7f5af0", fill: "#7f5af0" },
+      extrasSales: { stroke: "#22c55e", fill: "#22c55e" },
+      text: "#e5e7eb",
+      background: "#0b1020",
+    }
     : {
-        totalSales: { stroke: "#4f46e5", fill: "#c7d2fe" },
-        extrasSales: { stroke: "#16a34a", fill: "#dcfce7" },
-        text: "#374151",
-        background: "#fff",
-      };
+      totalSales: { stroke: "#7f5af0", fill: "#e0d4ff" },
+      extrasSales: { stroke: "#16a34a", fill: "#dcfce7" },
+      text: "#374151",
+      background: "#fff",
+    };
 
   return (
     <StyledSalesChart>
       <Heading as="h2">
-        Sales from {format(allDates.at(0), "MMM dd yyyy")} &mdash;{" "}
+        House revenue from {format(allDates.at(0), "MMM dd yyyy")} &mdash;{" "}
         {format(allDates.at(-1), "MMM dd yyyy")}{" "}
       </Heading>
 
@@ -84,7 +84,7 @@ function SalesChart({ bookings, numDays }) {
             stroke={colors.totalSales.stroke}
             fill={colors.totalSales.fill}
             strokeWidth={2}
-            name="Total sales"
+            name="Room revenue"
             unit="$"
           />
           <Area
@@ -93,7 +93,7 @@ function SalesChart({ bookings, numDays }) {
             stroke={colors.extrasSales.stroke}
             fill={colors.extrasSales.fill}
             strokeWidth={2}
-            name="Extras sales"
+            name="Extras & favors"
             unit="$"
           />
         </AreaChart>

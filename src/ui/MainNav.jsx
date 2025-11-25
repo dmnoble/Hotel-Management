@@ -51,6 +51,29 @@ const StyledNavLink = styled(NavLink)`
   &.active:visited svg {
     color: var(--color-brand-600);
   }
+    
+  &:hover,
+  &:active,
+  &.active:link,
+  &.active:visited {
+    color: var(--color-brand-600);
+    background: radial-gradient(circle at left, rgba(127, 90, 240, 0.18) 0, transparent 65%);
+    border-radius: var(--border-radius-sm);
+  }
+
+  & svg {
+    width: 2.4rem;
+    height: 2.4rem;
+    color: var(--color-grey-400);
+    transition: all 0.3s;
+  }
+
+  &:hover svg,
+  &:active svg,
+  &.active:link svg,
+  &.active:visited svg {
+    color: var(--color-brand-500);
+  }
 `;
 
 function MainNav() {
@@ -60,31 +83,31 @@ function MainNav() {
         <li>
           <StyledNavLink to="/dashboard">
             <HiOutlineHome />
-            <span>Home</span>
+            <span>Inn Overview</span>
           </StyledNavLink>
         </li>
         <li>
           <StyledNavLink to="/bookings">
             <HiOutlineCalendarDays />
-            <span>Bookings</span>
+            <span>Stays</span>
           </StyledNavLink>
         </li>
         <li>
           <StyledNavLink to="/cabins">
             <HiOutlineHomeModern />
-            <span>Cabins</span>
+            <span>Chambers</span>
           </StyledNavLink>
         </li>
         <li>
           <StyledNavLink to="/users">
             <HiOutlineUsers />
-            <span>Users</span>
+            <span>Staff & Guests</span>
           </StyledNavLink>
         </li>
         <li>
           <StyledNavLink to="/settings">
             <HiOutlineCog6Tooth />
-            <span>Settings</span>
+            <span>House Rules</span>
           </StyledNavLink>
         </li>
       </NavList>
