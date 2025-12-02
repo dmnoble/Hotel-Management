@@ -18,7 +18,13 @@ export interface Chamber {
     currentStayId?: string | null;
 }
 
+
 export interface Setting {
+    minBookingLength: number;
+    maxBookingLength: number;
+    maxGuestsPerBooking: number;
+    breakfastPrice: number;
+    editedAt?: string;
 }
 
 export interface Stay {
