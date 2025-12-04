@@ -15,7 +15,8 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   const { isEditing, editCabin } = useEditCabin();
   const isWorking = isCreating || isEditing;
 
-  const { id: editId, ...editValues } = cabinToEdit;
+  // Pull out id and existing image separately so we can reuse the image
+  const { id: editId, image: existingImage, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
 
   const { register, handleSubmit, reset, getValues, formState } = useForm({
@@ -23,29 +24,51 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   });
   const { errors } = formState;
 
+  // TODO: point this to a real image file you have in the project
+  const PLACEHOLDER_IMAGE = "/img/chambers/placeholder.jpg";
+
   function onSubmit(data) {
-    const image = typeof data.image === "string" ? data.image : data.image[0];
+    // We currently don't support real file uploads in local mode,
+    // so ignore the file field and use a string instead.
+    // Strip the form's "image" field from data
+    const { image: _unusedImageField, ...rest } = data;
+
+    let finalImage;
+
+    if (isEditSession) {
+      // For edits, keep whatever image the chamber already had (if any)
+      if (typeof existingImage === "string" && existingImage) {
+        finalImage = existingImage;
+      } else {
+        finalImage = PLACEHOLDER_IMAGE;
+      }
+    } else {
+      // For new chambers, always use a placeholder path for now
+      finalImage = PLACEHOLDER_IMAGE;
+    }
+
+    const newCabinPayload = {
+      ...rest,
+      image: finalImage,
+    };
 
     if (isEditSession)
       editCabin(
-        { newCabinData: { ...data, image }, id: editId },
+        { newCabinData: newCabinPayload, id: editId },
         {
-          onSuccess: (data) => {
+          onSuccess: () => {
             reset();
             onCloseModal?.();
           },
         }
       );
     else
-      createCabin(
-        { ...data, image: image },
-        {
-          onSuccess: (data) => {
-            reset();
-            onCloseModal?.();
-          },
-        }
-      );
+      createCabin(newCabinPayload, {
+        onSuccess: () => {
+          reset();
+          onCloseModal?.();
+        },
+      });
   }
 
   function onError(errors) {
@@ -129,17 +152,18 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
       </FormRow>
 
       <FormRow label="Chamber portrait">
+        {/* File input is currently cosmetic; real upload will be a future phase */}
         <FileInput
           id="image"
           accept="image/*"
           {...register("image", {
-            required: isEditSession ? false : "This field is required",
+            // no required rule for now, since we always set a placeholder
+            required: false,
           })}
         />
       </FormRow>
 
       <FormRow>
-        {/* type is an HTML attribute! */}
         <Button
           variation="secondary"
           type="reset"

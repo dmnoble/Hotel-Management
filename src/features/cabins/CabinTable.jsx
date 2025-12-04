@@ -7,10 +7,11 @@ import { useSearchParams } from "react-router-dom";
 import Empty from "../../ui/Empty";
 
 function CabinTable() {
-  const { isLoading, cabins } = useCabins();
+  const { isLoading, cabins, error } = useCabins();
   const [searchParams] = useSearchParams();
 
   if (isLoading) return <Spinner />;
+  if (error) return <Empty resourceName="chambers" />;
   if (!cabins.length) return <Empty resourceName="cabins" />;
 
   // 1) FILTER

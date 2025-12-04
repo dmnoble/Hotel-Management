@@ -1,70 +1,159 @@
 // src/services/apiCabins.ts
-// DEV-ONLY CABINS/CHAMBERS API LAYER
 
-import { backendMode } from './apiClient';
+import { backendMode, apiClient } from './apiClient';
 import { getChambersLocal } from './chambersLocal';
 import { getChambersHttp } from './chambersHttp';
 import type { Chamber } from '../types';
 
 const STORAGE_KEY = 'franken_chambers';
 
-async function getLocalChambers(): Promise<Chamber[]> {
-  // Reuse the helper that already reads from localStorage
-  return getChambersLocal();
+// Reuse the Chamber shape from shared types
+export type Cabin = Chamber;
+
+// ---------- Local helpers (dev / offline mode) ----------
+
+async function getLocalChambers(): Promise<Cabin[]> {
+  if (typeof localStorage === 'undefined') {
+    // No localStorage (SSR or test) – fall back to seed data helper
+    return getChambersLocal();
+  }
+
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) {
+    // No saved data yet – start from seed
+    const seed = await getChambersLocal();
+    saveLocalChambers(seed);
+    return seed;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Cabin[];
+    return parsed;
+  } catch {
+    // Corrupt local data – reset to seed
+    const seed = await getChambersLocal();
+    saveLocalChambers(seed);
+    return seed;
+  }
 }
 
-function saveLocalChambers(chambers: Chamber[]) {
+function saveLocalChambers(chambers: Cabin[]): void {
   if (typeof localStorage === 'undefined') return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(chambers));
 }
 
-export async function getCabins(): Promise<Chamber[]> {
-  if (backendMode === 'local') {
-    return getLocalChambers();
-  }
-  // HTTP mode – fetch from backend (already wired in Phase 2)
-  return getChambersHttp();
+// ---------- HTTP helpers (real backend mode) ----------
+
+async function getChambersFromHttp(): Promise<Cabin[]> {
+  // /api/v1/chambers returns { chambers: [...] }
+  const chambers = await getChambersHttp();
+  return chambers;
 }
 
-// Matches the original Wild-Oasis-style interface:
-// createEditCabin(newCabin) -> create
-// createEditCabin(newCabin, id) -> update
-export async function createEditCabin(
-  newCabin: Partial<Chamber>,
-  id?: string
-): Promise<Chamber> {
+async function createCabinHttp(
+  payload: Omit<Cabin, 'id'>
+): Promise<Cabin> {
+  return apiClient.post<Cabin>('/chambers', payload);
+}
+
+async function updateCabinHttp(
+  id: string | number,
+  payload: Partial<Cabin>
+): Promise<Cabin> {
+  return apiClient.put<Cabin>(`/chambers/${id}`, payload);
+}
+
+async function deleteCabinHttp(id: string | number): Promise<void> {
+  await apiClient.del<void>(`/chambers/${id}`);
+}
+
+// ---------- Public API used by the cabins UI ----------
+
+export async function getCabins(): Promise<Cabin[]> {
   if (backendMode === 'http') {
-    // TODO: wire to real POST/PUT /chambers later
-    throw new Error('createEditCabin over HTTP not implemented yet');
+    return getChambersFromHttp();
   }
 
+  return getLocalChambers();
+}
+
+export async function getCabin(
+  id: string | number
+): Promise<Cabin | undefined> {
+  const cabins = await getCabins();
+  return cabins.find((c) => String(c.id) === String(id));
+}
+
+export async function createEditCabin(
+  newCabin: Omit<Cabin, 'id'>,
+  id?: string | number
+): Promise<Cabin> {
+  // ---- HTTP mode: talk to franken-inn-api ----
+  if (backendMode === 'http') {
+    if (id != null) {
+      // Edit existing chamber
+      return updateCabinHttp(id, newCabin);
+    } else {
+      // Create new chamber
+      return createCabinHttp(newCabin);
+    }
+  }
+
+  // ---- Local mode: mutate localStorage-backed chambers ----
   const chambers = await getLocalChambers();
 
-  if (id) {
-    const index = chambers.findIndex((c) => c.id === id);
-    if (index === -1) {
-      throw new Error(`Chamber with id ${id} not found`);
+  // Helper to generate the next string id from existing ids
+  const getNextId = (): string => {
+    const maxId = chambers.reduce(
+      (max, c) => Math.max(max, Number(c.id) || 0),
+      0
+    );
+    return String(maxId + 1);
+  };
+
+  if (id != null) {
+    const idx = chambers.findIndex((c) => String(c.id) === String(id));
+
+    if (idx === -1) {
+      // Not found → treat as create
+      const created: Cabin = {
+        ...newCabin,
+        id: getNextId(), // string, matches Chamber.id
+      };
+      const next = [...chambers, created];
+      saveLocalChambers(next);
+      return created;
     }
-    const updated: Chamber = { ...chambers[index], ...newCabin, id } as Chamber;
-    chambers[index] = updated;
-    saveLocalChambers(chambers);
+
+    const updated: Cabin = {
+      ...chambers[idx],
+      ...newCabin,
+    };
+    const next = [...chambers];
+    next[idx] = updated;
+    saveLocalChambers(next);
     return updated;
   }
 
-  const newId = `CHAMBER_${Date.now()}`;
-  const created: Chamber = { ...(newCabin as Chamber), id: newId };
-  chambers.push(created);
-  saveLocalChambers(chambers);
+  // Create new in local mode
+  const created: Cabin = {
+    ...newCabin,
+    id: getNextId(), // string here as well
+  };
+
+  const next = [...chambers, created];
+  saveLocalChambers(next);
   return created;
 }
 
+
 export async function deleteCabin(id: string): Promise<void> {
   if (backendMode === 'http') {
-    // TODO: wire to DELETE /chambers/:id later
-    throw new Error('deleteCabin over HTTP not implemented yet');
+    await deleteCabinHttp(id);
+    return;
   }
 
   const chambers = await getLocalChambers();
-  const filtered = chambers.filter((c) => c.id !== id);
+  const filtered = chambers.filter((c) => String(c.id) !== String(id));
   saveLocalChambers(filtered);
 }
