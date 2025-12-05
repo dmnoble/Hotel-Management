@@ -114,7 +114,7 @@ html {
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Cinzel", sans-serif;
   color: var(--color-grey-700);
 
   transition: color 0.3s, background-color 0.3s;
@@ -154,6 +154,22 @@ select:disabled,
 input:disabled {
   background-color: var(--color-grey-200);
   color: var(--color-grey-500);
+}
+  
+/* Make file input text dark and readable */
+input[type="file"] {
+  color: var(--color-grey-900);
+}
+
+/* Modern browsers: style the button & text inside the file input */
+input[type="file"]::file-selector-button {
+  color: var(--color-grey-900);
+}
+
+/* Keep file inputs readable even when disabled */
+input[type="file"]:disabled,
+input[type="file"]:disabled::file-selector-button {
+  color: var(--color-grey-900);
 }
 
 input:focus,

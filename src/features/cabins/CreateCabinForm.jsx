@@ -27,49 +27,45 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   // TODO: point this to a real image file you have in the project
   const PLACEHOLDER_IMAGE = "/img/chambers/placeholder.jpg";
 
-  function onSubmit(data) {
-    // We currently don't support real file uploads in local mode,
-    // so ignore the file field and use a string instead.
-    // Strip the form's "image" field from data
-    const { image: _unusedImageField, ...rest } = data;
+function onSubmit(data) {
+  const { image, ...rest } = data;
 
-    let finalImage;
+  let finalImage;
 
-    if (isEditSession) {
-      // For edits, keep whatever image the chamber already had (if any)
-      if (typeof existingImage === "string" && existingImage) {
-        finalImage = existingImage;
-      } else {
-        finalImage = PLACEHOLDER_IMAGE;
-      }
-    } else {
-      // For new chambers, always use a placeholder path for now
-      finalImage = PLACEHOLDER_IMAGE;
-    }
+  if (typeof image === "string" && image.trim() !== "") {
+    // User provided an image URL/path
+    finalImage = image.trim();
+  } else if (isEditSession && typeof existingImage === "string" && existingImage) {
+    // Keep whatever image the chamber already used
+    finalImage = existingImage;
+  } else {
+    // Fall back to placeholder
+    finalImage = PLACEHOLDER_IMAGE;
+  }
 
-    const newCabinPayload = {
-      ...rest,
-      image: finalImage,
-    };
+  const newCabinPayload = {
+    ...rest,
+    image: finalImage,
+  };
 
-    if (isEditSession)
-      editCabin(
-        { newCabinData: newCabinPayload, id: editId },
-        {
-          onSuccess: () => {
-            reset();
-            onCloseModal?.();
-          },
-        }
-      );
-    else
-      createCabin(newCabinPayload, {
+  if (isEditSession)
+    editCabin(
+      { newCabinData: newCabinPayload, id: editId },
+      {
         onSuccess: () => {
           reset();
           onCloseModal?.();
         },
-      });
-  }
+      }
+    );
+  else
+    createCabin(newCabinPayload, {
+      onSuccess: () => {
+        reset();
+        onCloseModal?.();
+      },
+    });
+}
 
   function onError(errors) {
     // console.log(errors);
@@ -151,13 +147,13 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
         />
       </FormRow>
 
-      <FormRow label="Chamber portrait">
-        {/* File input is currently cosmetic; real upload will be a future phase */}
-        <FileInput
+      <FormRow label="Chamber image URL" error={errors?.image?.message}>
+        <Input
+          type="text"
           id="image"
-          accept="image/*"
+          disabled={isWorking}
+          placeholder="https://example.com/room.jpg"
           {...register("image", {
-            // no required rule for now, since we always set a placeholder
             required: false,
           })}
         />
